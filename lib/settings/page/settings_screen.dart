@@ -1,3 +1,4 @@
+import 'package:e_commerce/address/page/address_screen.dart';
 import 'package:e_commerce/profile/page/profile_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -70,7 +71,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   Divider(),
                   InkWell(
-                    onTap: (){},
+                    onTap: () => Navigator.push(context,MaterialPageRoute(builder: (context) => AddressScreen(),)),
                     overlayColor: WidgetStateColor.transparent,
                     child: Container(
                       width: 334.92,

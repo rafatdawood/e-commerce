@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
-class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+class EditAddressScreen extends StatefulWidget {
+  const EditAddressScreen({super.key});
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  State<EditAddressScreen> createState() => _EditAddressScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _EditAddressScreenState extends State<EditAddressScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,7 +24,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Container(
                   padding: EdgeInsets.symmetric(vertical: 7),
                   child: Text(
-                    'Settings',
+                    'Shipping Address',
                     style: TextStyle(
                       color: Color(0xFF202020),
                       fontSize: 28,
@@ -39,7 +38,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   margin: EdgeInsets.only(bottom: 18),
                   padding: EdgeInsets.symmetric(vertical: 7),
                   child: Text(
-                    'Your Profile',
+                    'Edit Addres',
                     style: TextStyle(
                       color: Colors.black,
                       fontSize: 16,
@@ -49,47 +48,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                 ),
-                Stack(
-                  children: [
-                    Container(
-                      height: 105,
-                      width: 105,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                              color: Colors.black.withOpacity(0.07),
-                              offset: Offset(0, 3),
-                              spreadRadius: 2,
-                              blurRadius: 1)
-                        ],
-                      ),
-                    ),
-                    Positioned(
-                      top: 6.5,
-                      right: 6.5,
-                      child: Container(
-                        height: 92,
-                        width: 92,
-                        decoration: BoxDecoration(
-                            color: Colors.black, shape: BoxShape.circle),
-                      ),
-                    ),
-                    Positioned(
-                      top: 0,
-                      right: 0,
-                      child: Container(
-                          width: 30,
-                          height: 30,
-                          child: SvgPicture.asset('assets/icons/edit_image.svg')),
-                    ),
-                  ],
-                ),
                 Container(
                   margin: EdgeInsets.only(top: 20),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Text(
+                        'Name',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 13,
+                          fontFamily: 'Nunito Sans',
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                       TextField(
                         decoration: InputDecoration(
                           enabledBorder: OutlineInputBorder(
@@ -108,10 +80,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             fontWeight: FontWeight.w500,
                           ),
                           contentPadding:
-                              EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                         ),
                       ),
                       SizedBox(height: 10),
+                      Text(
+                        'City',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 13,
+                          fontFamily: 'Nunito Sans',
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                       TextField(
                         decoration: InputDecoration(
                           enabledBorder: OutlineInputBorder(
@@ -122,7 +103,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               borderRadius: BorderRadius.circular(9)),
                           fillColor: Color(0xFFF1F4FE),
                           filled: true,
-                          hintText: 'Email',
+                          hintText: 'City',
                           hintStyle: TextStyle(
                             color: Color(0xFFD2D2D2),
                             fontSize: 13.83,
@@ -130,10 +111,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             fontWeight: FontWeight.w500,
                           ),
                           contentPadding:
-                              EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                         ),
                       ),
                       SizedBox(height: 10),
+                      Text(
+                        'Region',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 13,
+                          fontFamily: 'Nunito Sans',
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                       TextField(
                         decoration: InputDecoration(
                           enabledBorder: OutlineInputBorder(
@@ -144,7 +134,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               borderRadius: BorderRadius.circular(9)),
                           fillColor: Color(0xFFF1F4FE),
                           filled: true,
-                          hintText: 'Password',
+                          hintText: 'Region',
                           hintStyle: TextStyle(
                             color: Color(0xFFD2D2D2),
                             fontSize: 13.83,
@@ -152,7 +142,69 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             fontWeight: FontWeight.w500,
                           ),
                           contentPadding:
-                              EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Text(
+                        'Details',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 13,
+                          fontFamily: 'Nunito Sans',
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      TextField(
+                        decoration: InputDecoration(
+                          enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.transparent),
+                              borderRadius: BorderRadius.circular(9)),
+                          focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.transparent),
+                              borderRadius: BorderRadius.circular(9)),
+                          fillColor: Color(0xFFF1F4FE),
+                          filled: true,
+                          hintText: 'Details',
+                          hintStyle: TextStyle(
+                            color: Color(0xFFD2D2D2),
+                            fontSize: 13.83,
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w500,
+                          ),
+                          contentPadding:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Text(
+                        'Notes',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 13,
+                          fontFamily: 'Nunito Sans',
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      TextField(
+                        decoration: InputDecoration(
+                          enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.transparent),
+                              borderRadius: BorderRadius.circular(9)),
+                          focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.transparent),
+                              borderRadius: BorderRadius.circular(9)),
+                          fillColor: Color(0xFFF1F4FE),
+                          filled: true,
+                          hintText: 'Notes',
+                          hintStyle: TextStyle(
+                            color: Color(0xFFD2D2D2),
+                            fontSize: 13.83,
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w500,
+                          ),
+                          contentPadding:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                         ),
                       ),
                     ],

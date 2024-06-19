@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
           // locale: DevicePreview.locale(context),
           // builder: DevicePreview.appBuilder,
           theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
             useMaterial3: true,
           ),
           home: StartScreen(),
