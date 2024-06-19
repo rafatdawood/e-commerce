@@ -2,7 +2,7 @@ import 'package:e_commerce/cart/page/cart_screen.dart';
 import 'package:e_commerce/favorites/page/favorites_screen.dart';
 import 'package:e_commerce/home/page/home_screen.dart';
 import 'package:e_commerce/orders/page/orders_screen.dart';
-import 'package:e_commerce/profile/page/profile_screen.dart';
+import 'package:e_commerce/settings/page/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -20,7 +20,7 @@ class _MainScreenState extends State<MainScreen> {
     OrdersScreen(),
     HomeScreen(),
     CartScreen(),
-    ProfileScreen()
+    SettingsScreen()
   ];
 
   @override
