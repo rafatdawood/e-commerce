@@ -1,4 +1,8 @@
+import 'package:e_commerce/about/page/about_screen.dart';
 import 'package:e_commerce/address/page/address_screen.dart';
+import 'package:e_commerce/f_a_qs/page/f_a_qs_screen.dart';
+import 'package:e_commerce/language/page/language_screen.dart';
+import 'package:e_commerce/notifications/page/notifications_screen.dart';
 import 'package:e_commerce/profile/page/profile_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -110,7 +114,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   SizedBox(height: 30),
                   InkWell(
-                    onTap: (){},
+                    onTap: ()=>Navigator.push(context,MaterialPageRoute(builder: (context) => LanguageScreen(),)),
                     overlayColor: WidgetStateColor.transparent,
                     child: Container(
                       width: 334.92,
@@ -155,7 +159,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   Divider(),
                   InkWell(
-                    onTap: (){},
+                    onTap: ()=> Navigator.push(context,MaterialPageRoute(builder: (context) => NotificationsScreen(),)),
                     overlayColor: WidgetStateColor.transparent,
                     child: Container(
                       width: 334.92,
@@ -183,7 +187,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   Divider(),
                   InkWell(
-                    onTap: (){},
+                    onTap: ()=>Navigator.push(context,MaterialPageRoute(builder: (context) => FAQsScreen(),)),
                     overlayColor: WidgetStateColor.transparent,
                     child: Container(
                       width: 334.92,
@@ -211,7 +215,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   Divider(),
                   InkWell(
-                    onTap: (){},
+                    onTap: ()=>Navigator.push(context,MaterialPageRoute(builder: (context) => AboutScreen(),)),
                     overlayColor: WidgetStateColor.transparent,
                     child: Container(
                       width: 334.92,
