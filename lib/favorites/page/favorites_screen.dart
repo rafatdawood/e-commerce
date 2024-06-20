@@ -23,7 +23,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        padding: const EdgeInsets.only(left: 20,right: 20,top: 50),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
