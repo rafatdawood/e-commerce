@@ -1,3 +1,4 @@
+import 'package:e_commerce/core/sheard.dart';
 import 'package:e_commerce/create_account/page/create_account_screen.dart';
 import 'package:e_commerce/login/page/login_screen.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,11 @@ class StartScreen extends StatefulWidget {
 }
 
 class _StartScreenState extends State<StartScreen> {
+  @override
+  void initState() {
+    super.initState();
+    PreferenceUtils.setString(PrefKeys.language,'en');
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(

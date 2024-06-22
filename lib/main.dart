@@ -3,7 +3,13 @@ import 'package:e_commerce/start/page/start_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
+import 'core/sheard.dart';
+import 'core/store_app_dio.dart';
+
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  PreferenceUtils.init();
+  AppDio.init();
   runApp(const MyApp());
   // runApp(
   //   DevicePreview(

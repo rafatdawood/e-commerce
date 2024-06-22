@@ -1,6 +1,8 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:e_commerce/main/page/main_screen.dart';
+import 'package:e_commerce/welcom/manager/welcome_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class WelcomeScreen extends StatefulWidget {
@@ -11,66 +13,60 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
-  int activeIndex = 0;
-  List images = [
-    {
-      'image': 'assets/images/welcome_1.jpg',
-      'title': 'Hello',
-      'contact':
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non consectetur turpis. Morbi eu eleifend lacus.',
-      'pt': false
-    },
-    {
-      'image': 'assets/images/welcome_2.jpg',
-      'title': 'Ready?',
-      'contact': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-      'pt': true
-    },
-  ];
+  final cubit = WelcomeCubit();
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20),
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/bubbles_welcome.png'),
-            fit: BoxFit.cover,
-          ),
-        ),
-        width: double.infinity,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Center(
-              child: CarouselSlider.builder(
-                itemCount: images.length,
-                itemBuilder: (BuildContext context, int index, int realIndex) {
-                  final image = images[index]['image'];
-                  final title = images[index]['title'];
-                  final contact = images[index]['contact'];
-                  final pt = images[index]['pt'];
-                  return buildImage(image, index, title, contact, pt);
-                },
-                options: CarouselOptions(
-                  height: 614,
-                  viewportFraction: 1,
-                  enableInfiniteScroll: false,
-                  onPageChanged: (index, reason) =>
-                      setState(() => activeIndex = index),
-                ),
-              ),
+    return BlocProvider(
+      create: (context) => cubit,
+      child: Scaffold(
+        body: Container(
+          padding: EdgeInsets.symmetric(horizontal: 20),
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/images/bubbles_welcome.png'),
+              fit: BoxFit.cover,
             ),
-            SizedBox(height: 20),
-            buildIndicator(),
-          ],
+          ),
+          width: double.infinity,
+          child: BlocBuilder<WelcomeCubit, WelcomeState>(
+            builder: (context, state) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Center(
+                    child: CarouselSlider.builder(
+                      itemCount: cubit.images.length,
+                      itemBuilder:
+                          (BuildContext context, int index, int realIndex) {
+                        final image = cubit.images[index]['image'];
+                        final title = cubit.images[index]['title'];
+                        final contact = cubit.images[index]['contact'];
+                        final pt = cubit.images[index]['pt'];
+                        return buildImage(image, index, title, contact, pt);
+                      },
+                      options: CarouselOptions(
+                        height: 614,
+                        viewportFraction: 1,
+                        enableInfiniteScroll: false,
+                        onPageChanged: (index, reason) =>
+                            cubit.slideImages(index),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  buildIndicator(),
+                ],
+              );
+            },
+          ),
         ),
       ),
     );
   }
 
-  Widget buildImage(image, int index, title, contact, pt) => Container(
+  Widget buildImage(image, int index, title, contact, pt) =>
+      Container(
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           boxShadow: [
@@ -129,7 +125,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     if (pt) {
       return InkWell(
         onTap: () {
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainScreen(),));
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MainScreen(),
+              ));
         },
         overlayColor: const WidgetStatePropertyAll(Colors.transparent),
         child: Container(
@@ -159,9 +159,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     }
   }
 
-  Widget buildIndicator() => AnimatedSmoothIndicator(
-        activeIndex: activeIndex,
-        count: images.length,
+  Widget buildIndicator() =>
+      AnimatedSmoothIndicator(
+        activeIndex: cubit.activeIndex,
+        count: cubit.images.length,
         effect: JumpingDotEffect(
             dotHeight: 20,
             dotWidth: 20,

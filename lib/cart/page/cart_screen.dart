@@ -1,5 +1,10 @@
+import 'package:e_commerce/cart/manager/cart_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
+import '../../core/sheard.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -9,95 +14,104 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
-  final List cartsList = List.generate(
-    0,
-    (index) => {
-      'id': index,
-      'name': 'Lorem ipsum dolor sit amet consectetur.',
-      'imageUrl': 'assets/images/welcome_1.jpg',
-      'price': 17.00,
-      'units': 1,
-    },
-  ).toList();
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    cubit.getData();
+  }
+
+  final cubit = CartCubit();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                child: Text(
-                  'Cart',
-                  style: TextStyle(
-                    color: Color(0xFF202020),
-                    fontSize: 28,
-                    fontFamily: 'Raleway',
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.28,
-                  ),
-                ),
-              ),
-            ),
-            Container(
-              height: 100,
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-              clipBehavior: Clip.antiAlias,
-              decoration: BoxDecoration(
-                  color: Color(0xFFF8F8F8),
-                  borderRadius: BorderRadius.circular(10)),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: BlocProvider(
+        create: (context) => cubit,
+        child: BlocBuilder<CartCubit, CartState>(
+          builder: (context, state) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Text(
-                        'Shipping Address',
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      child: Text(
+                        'Cart',
                         style: TextStyle(
                           color: Color(0xFF202020),
-                          fontSize: 14,
+                          fontSize: 28,
                           fontFamily: 'Raleway',
                           fontWeight: FontWeight.w700,
-                          letterSpacing: -0.14,
+                          letterSpacing: -0.28,
                         ),
                       ),
-                      SizedBox(
-                        width: 237,
-                        height: 50,
-                        child: Text(
-                          '26, Duong So 2, Thao Dien Ward, An Phu, District 2, Ho Chi Minh city',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 13,
-                            fontFamily: 'Nunito Sans',
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Container(
-                    alignment: Alignment.center,
-                    width: 32,
-                    child: InkWell(
-                      onTap: () {},
-                      child: SvgPicture.asset('assets/icons/button_edit.svg'),
                     ),
                   ),
+                  Container(
+                    height: 100,
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                    clipBehavior: Clip.antiAlias,
+                    decoration: BoxDecoration(
+                        color: Color(0xFFF8F8F8),
+                        borderRadius: BorderRadius.circular(10)),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Text(
+                              'Shipping Address',
+                              style: TextStyle(
+                                color: Color(0xFF202020),
+                                fontSize: 14,
+                                fontFamily: 'Raleway',
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: -0.14,
+                              ),
+                            ),
+                            SizedBox(
+                              width: 237,
+                              height: 50,
+                              child: Text(
+                                '26, Duong So 2, Thao Dien Ward, An Phu, District 2, Ho Chi Minh city',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 13,
+                                  fontFamily: 'Nunito Sans',
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Container(
+                          alignment: Alignment.center,
+                          width: 32,
+                          child: InkWell(
+                            onTap: () {},
+                            child: SvgPicture.asset(
+                                'assets/icons/button_edit.svg'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  BlocListener<CartCubit, CartState>(
+                    listener: (context, state) => deleteItems(state),
+                    child: Expanded(
+                      child: checkIsEmpty(),
+                    ),
+                  )
                 ],
               ),
-            ),
-            Expanded(
-              child: checkIsEmpty(),
-            )
-          ],
+            );
+          },
         ),
       ),
     );
@@ -117,7 +131,8 @@ class _CartScreenState extends State<CartScreen> {
                   height: 109,
                   decoration: BoxDecoration(
                     image: DecorationImage(
-                        image: AssetImage(cartsList[index]['imageUrl']),
+                        image: NetworkImage(cubit.cartsList['data']
+                            ['cart_items'][index]['product']['image']),
                         fit: BoxFit.fill),
                     boxShadow: [
                       BoxShadow(
@@ -140,7 +155,9 @@ class _CartScreenState extends State<CartScreen> {
                   bottom: 10,
                   left: 10,
                   child: InkWell(
-                    onTap: () {},
+                    onTap: () => cubit.deleteItem(cubit.cartsList['data']
+                            ['cart_items'][index]['id']
+                        .toString()),
                     child: SvgPicture.asset(
                       'assets/icons/button_delete.svg',
                       width: 35,
@@ -160,7 +177,8 @@ class _CartScreenState extends State<CartScreen> {
                       height: 36,
                       child: Text(
                         maxLines: 2,
-                        cartsList[index]['name'],
+                        cubit.cartsList['data']['cart_items'][index]['product']
+                            ['name'],
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 12,
@@ -174,7 +192,7 @@ class _CartScreenState extends State<CartScreen> {
                       children: [
                         SizedBox(
                           child: Text(
-                            '\$${cartsList[index]['price']}',
+                            '\$${cubit.cartsList['data']['cart_items'][index]['product']['price']}',
                             style: TextStyle(
                               color: Color(0xFF202020),
                               fontSize: 18,
@@ -191,14 +209,18 @@ class _CartScreenState extends State<CartScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               InkWell(
-                                onTap: (){},
+                                onTap: () => cubit.decreaseQuantity(
+                                    cubit.cartsList['data']['cart_items'][index]
+                                        ['id'].toString(),
+                                    cubit.cartsList['data']['cart_items'][index]
+                                        ['quantity']),
                                 child:
                                     SvgPicture.asset('assets/icons/less.svg'),
                               ),
                               Container(
                                 child: Text(
                                   textAlign: TextAlign.center,
-                                  '${cartsList[index]['units']}',
+                                  '${cubit.cartsList['data']['cart_items'][index]['quantity']}',
                                   style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 16,
@@ -214,7 +236,11 @@ class _CartScreenState extends State<CartScreen> {
                                     color: Color(0xffE5EBFC)),
                               ),
                               InkWell(
-                                onTap: () {},
+                                onTap: () => cubit.increaseQuantity(
+                                    cubit.cartsList['data']['cart_items'][index]
+                                    ['id'].toString(),
+                                    cubit.cartsList['data']['cart_items'][index]
+                                    ['quantity']),
                                 child:
                                     SvgPicture.asset('assets/icons/more.svg'),
                               ),
@@ -234,13 +260,23 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   Widget checkIsEmpty() {
-    if (cartsList.isEmpty) {
+    if (cubit.cartsList['data']['cart_items'].isEmpty) {
       return Image.asset('assets/images/empty_cart.png');
     } else {
       return ListView.builder(
-        itemCount: cartsList.length,
+        itemCount: cubit.cartsList['data']['cart_items'].length,
         itemBuilder: (context, index) => buildCartItems(index),
       );
     }
   }
+
+  deleteItems(CartState state) {
+    if (state is CartDeleteSuccess) {
+      Fluttertoast.showToast(msg: state.massage);
+    }else if(state is CartCounter){
+      Fluttertoast.showToast(msg: state.massage);
+    }
+  }
+
+
 }
