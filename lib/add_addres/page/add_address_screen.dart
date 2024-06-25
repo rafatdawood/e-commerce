@@ -1,3 +1,5 @@
+import 'package:e_commerce/core/store_app_dio.dart';
+import 'package:e_commerce/core/store_app_endpoints.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
@@ -9,6 +11,12 @@ class AddAddressScreen extends StatefulWidget {
 }
 
 class _AddAddressScreenState extends State<AddAddressScreen> {
+  final nameController = TextEditingController();
+  final cityController = TextEditingController();
+  final regionController = TextEditingController();
+  final detailsController = TextEditingController();
+  final notesController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,6 +72,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                         ),
                       ),
                       TextField(
+                        controller: nameController,
                         decoration: InputDecoration(
                           enabledBorder: OutlineInputBorder(
                               borderSide: BorderSide(color: Colors.transparent),
@@ -80,8 +89,8 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                             fontFamily: 'Poppins',
                             fontWeight: FontWeight.w500,
                           ),
-                          contentPadding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 16),
                         ),
                       ),
                       SizedBox(height: 10),
@@ -95,6 +104,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                         ),
                       ),
                       TextField(
+                        controller: cityController,
                         decoration: InputDecoration(
                           enabledBorder: OutlineInputBorder(
                               borderSide: BorderSide(color: Colors.transparent),
@@ -111,8 +121,8 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                             fontFamily: 'Poppins',
                             fontWeight: FontWeight.w500,
                           ),
-                          contentPadding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 16),
                         ),
                       ),
                       SizedBox(height: 10),
@@ -126,6 +136,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                         ),
                       ),
                       TextField(
+                        controller: regionController,
                         decoration: InputDecoration(
                           enabledBorder: OutlineInputBorder(
                               borderSide: BorderSide(color: Colors.transparent),
@@ -142,8 +153,8 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                             fontFamily: 'Poppins',
                             fontWeight: FontWeight.w500,
                           ),
-                          contentPadding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 16),
                         ),
                       ),
                       SizedBox(height: 10),
@@ -157,6 +168,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                         ),
                       ),
                       TextField(
+                        controller: detailsController,
                         decoration: InputDecoration(
                           enabledBorder: OutlineInputBorder(
                               borderSide: BorderSide(color: Colors.transparent),
@@ -173,8 +185,8 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                             fontFamily: 'Poppins',
                             fontWeight: FontWeight.w500,
                           ),
-                          contentPadding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 16),
                         ),
                       ),
                       SizedBox(height: 10),
@@ -188,6 +200,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                         ),
                       ),
                       TextField(
+                        controller: notesController,
                         decoration: InputDecoration(
                           enabledBorder: OutlineInputBorder(
                               borderSide: BorderSide(color: Colors.transparent),
@@ -204,8 +217,8 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                             fontFamily: 'Poppins',
                             fontWeight: FontWeight.w500,
                           ),
-                          contentPadding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 16),
                         ),
                       ),
                     ],
@@ -214,7 +227,13 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
               ],
             ),
             InkWell(
-              onTap: () {},
+              onTap: () => addAddress(
+                name: nameController.text,
+                city: cityController.text,
+                details: detailsController.text,
+                notes: notesController.text,
+                region: regionController.text,
+              ),
               overlayColor: const WidgetStatePropertyAll(Colors.transparent),
               child: Container(
                 margin: EdgeInsets.symmetric(vertical: 20),
@@ -243,5 +262,24 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
         ),
       ),
     );
+  }
+
+  Future<void>addAddress({
+    required String name,
+    required String city,
+    required String region,
+    required String details,
+    required String notes,
+  }) async {
+    final response = await AppDio.post(endpoint: EndPoints.addresses, body: {
+      'name': name,
+      'city': city,
+      'region': region,
+      'details': details,
+      'notes': notes,
+      'latitude':'0.0',
+      'longitude':'0.0',
+    });
+    Navigator.pop(context,response.data);
   }
 }

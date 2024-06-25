@@ -1,6 +1,9 @@
 import 'package:device_preview/device_preview.dart';
+import 'package:e_commerce/favorites/manager/favorites_cubit.dart';
+import 'package:e_commerce/main/page/main_screen.dart';
 import 'package:e_commerce/start/page/start_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import 'core/sheard.dart';
@@ -26,15 +29,20 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ResponsiveSizer(
       builder: (BuildContext, Orientation, ScreenType) {
-        return MaterialApp(
-          title: 'Flutter Demo',
-          // locale: DevicePreview.locale(context),
-          // builder: DevicePreview.appBuilder,
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
-            useMaterial3: true,
+        return BlocProvider(
+          create: (context) => FavoritesCubit(),
+          child: MaterialApp(
+            title: 'Flutter Demo',
+            // locale: DevicePreview.locale(context),
+            // builder: DevicePreview.appBuilder,
+            theme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
+              useMaterial3: true,
+            ),
+            home: PreferenceUtils.getBool(PrefKeys.loggedIn)
+                ? MainScreen()
+                : StartScreen(),
           ),
-          home: StartScreen(),
         );
       },
     );

@@ -10,19 +10,20 @@ class LoginCubit extends Cubit<LoginState> {
   LoginCubit() : super(LoginInitial());
   bool showPassword = true;
 
-  login({required email, required password}) {
-    AppDio.post(
+  login({required email, required password}) async{
+    final response = await AppDio.post(
         endpoint: EndPoints.login,
-        body: {'email': email, 'password': password}).then((value) {
-      if (value.data['status']) {
-        emit(LoginSuccessState(value.data['message']));
+        body: {'email': email, 'password': password});
+      if (response.data['status']) {
+        emit(LoginSuccessState(response.data['message']));
         PreferenceUtils.setBool(PrefKeys.loggedIn, true);
-        PreferenceUtils.setString(PrefKeys.apiToken, value.data['data']['token']);
-        print(PreferenceUtils.getString(PrefKeys.apiToken));
+        PreferenceUtils.setString(PrefKeys.apiToken, response.data['data']['token']);
       } else {
-        emit(LoginFailureState(value.data['message']));
+        emit(LoginFailureState(response.data['message']));
       }
-    });
+      print(PreferenceUtils.getString(PrefKeys.apiToken));
+      print(PreferenceUtils.getBool(PrefKeys.loggedIn));
+      print(PreferenceUtils.getString(PrefKeys.language));
   }
 
   togglePassword() {

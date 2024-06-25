@@ -1,5 +1,9 @@
+import 'package:e_commerce/favorites/manager/favorites_cubit.dart';
+import 'package:e_commerce/product/page/product_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({super.key});
@@ -9,43 +13,52 @@ class FavoritesScreen extends StatefulWidget {
 }
 
 class _FavoritesScreenState extends State<FavoritesScreen> {
-  final List wishList = List.generate(
-    5,
-        (index) => {
-      'id': index,
-      'name': 'Lorem ipsum dolor sit amet consectetur.',
-      'imageUrl': 'assets/images/welcome_1.jpg',
-      'price': 17.00,
-    },
-  ).toList();
+  final cubit = FavoritesCubit();
+
+  @override
+  void initState() {
+    super.initState();
+    cubit.getData();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Padding(
-        padding: const EdgeInsets.only(left: 20,right: 20,top: 50),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                child: Text(
-                  'Wishlist',
-                  style: TextStyle(
-                    color: Color(0xFF202020),
-                    fontSize: 28,
-                    fontFamily: 'Raleway',
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.28,
-                  ),
+      body: BlocProvider(
+        create: (context) => cubit,
+        child: BlocBuilder<FavoritesCubit, FavoritesState>(
+          builder: (context, state) {
+            return BlocListener<FavoritesCubit, FavoritesState>(
+              listener: (context, state) => logic(state),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 20, right: 20, top: 50),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        child: Text(
+                          'Wishlist',
+                          style: TextStyle(
+                            color: Color(0xFF202020),
+                            fontSize: 28,
+                            fontFamily: 'Raleway',
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.28,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: checkIsEmpty(),
+                    )
+                  ],
                 ),
               ),
-            ),
-            Expanded(
-              child: checkIsEmpty(),
-            )
-          ],
+            );
+          },
         ),
       ),
     );
@@ -65,7 +78,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                   height: 109,
                   decoration: BoxDecoration(
                     image: DecorationImage(
-                        image: AssetImage(wishList[index]['imageUrl']),
+                        image: NetworkImage(cubit.wishList['data']['data']
+                            [index]['product']['image']),
                         fit: BoxFit.fill),
                     boxShadow: [
                       BoxShadow(
@@ -88,7 +102,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                   bottom: 10,
                   left: 10,
                   child: InkWell(
-                    onTap: () {},
+                    onTap: () => cubit.delete(
+                        cubit.wishList['data']['data'][index]['id'].toString(),
+                        index),
                     child: SvgPicture.asset(
                       'assets/icons/button_delete.svg',
                       width: 35,
@@ -108,7 +124,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                       height: 36,
                       child: Text(
                         maxLines: 2,
-                        wishList[index]['name'],
+                        cubit.wishList['data']['data'][index]['product']
+                            ['name'],
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 12,
@@ -122,7 +139,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                       children: [
                         SizedBox(
                           child: Text(
-                            '\$${wishList[index]['price']}',
+                            '\$${cubit.wishList['data']['data'][index]['product']['price']}',
                             style: TextStyle(
                               color: Color(0xFF202020),
                               fontSize: 18,
@@ -135,9 +152,12 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                         Container(
                           height: 30,
                           child: InkWell(
-                            onTap: (){},
-                            child:
-                            SvgPicture.asset('assets/icons/add_to_cart.svg'),
+                            onTap: () => cubit.addToCart(cubit.wishList['data']
+                                    ['data'][index]['product']['id']
+                                .toString()),
+                            overlayColor: WidgetStateColor.transparent,
+                            child: SvgPicture.asset(
+                                'assets/icons/add_to_cart.svg'),
                           ),
                         )
                       ],
@@ -153,13 +173,30 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   }
 
   Widget checkIsEmpty() {
-    if (wishList.isEmpty) {
+    if (cubit.wishList['data']['data'].isEmpty) {
       return Image.asset('assets/images/empty_wishlist.png');
     } else {
       return ListView.builder(
-        itemCount: wishList.length,
-        itemBuilder: (context, index) => buildWishItems(index),
+        itemCount: cubit.wishList['data']['data'].length,
+        itemBuilder: (context, index) => InkWell(
+            onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProductScreen(
+                      id: cubit.wishList['data']['data'][index]['product']
+                          ['id'].toString()),
+                )),
+            overlayColor: WidgetStateColor.transparent,
+            child: buildWishItems(index)),
       );
+    }
+  }
+
+  logic(FavoritesState state) {
+    if (state is FavoritesDelete) {
+      Fluttertoast.showToast(msg: state.message);
+    } else if (state is FavoritesAddSuccess) {
+      Fluttertoast.showToast(msg: state.message);
     }
   }
 }

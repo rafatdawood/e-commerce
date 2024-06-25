@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
+import '../../core/sheard.dart';
+
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
 
@@ -14,6 +16,13 @@ class WelcomeScreen extends StatefulWidget {
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
   final cubit = WelcomeCubit();
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    print(PreferenceUtils.getString(PrefKeys.apiToken));
+    print(PreferenceUtils.getBool(PrefKeys.loggedIn));
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -16,18 +16,46 @@ class HomeCubit extends Cubit<HomeState> {
     'data': {},
   };
 
-  getAllData() {
-    AppDio.get(endpoint: EndPoints.categories).then((val) {
-      categories['data'] = val.data['data'];
-      AppDio.get(endpoint: EndPoints.home).then((val) {
-        productsAndBanners['data'] = val.data['data'];
-        emit(HomeSuccessState());
-      });
-    });
 
+  Future<void> getCategories() async {
+    final response = await AppDio.get(endpoint: EndPoints.categories);
+    categories['data'] = response.data['data'];
+  }
+
+  Future<void> getProductsAndBanners() async {
+    final response = await AppDio.get(endpoint: EndPoints.home);
+    productsAndBanners['data'] = response.data['data'];
+  }
+
+  Future<void> getAllData() async {
+    await getCategories();
+    await getProductsAndBanners();
+    emit(HomeSuccessState());
+  }
+
+  Future<void> removeOrAdd(String id, int index) async {
+    final response = await AppDio.post(
+        endpoint: EndPoints.getFavorites, body: {'product_id': id});
+    if(response.data['status']){
+      productsAndBanners['data']['products'][index]['in_favorites'] =
+      !productsAndBanners['data']['products'][index]['in_favorites'];
+      emit(HomeAddOrRemove(response.data['message']));
+    }else{
+      emit(HomeAddOrRemoveFailure(response.data['message']));
+    }
+    emit(HomeSuccessState());
+  }
+
+  edit(res){
+    for(int i=0 ;i < res.length;i++){
+      int x = productsAndBanners['data']['products'].indexWhere((e)=> e['id'] == res[i]['id']);
+      productsAndBanners['data']['products'][x]['in_favorites'] = res[i]['in_favorites'];
+    }
+    emit(HomeSuccessState());
   }
 
   showImages(index) {
     activeIndex = index;
+    emit(HomeSuccessState());
   }
 }

@@ -1,8 +1,10 @@
 import 'package:e_commerce/category_details/manager/category_cubit.dart';
+import 'package:e_commerce/favorites/manager/favorites_cubit.dart';
 import 'package:e_commerce/product/page/product_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 class CategoryDetailsScreen extends StatefulWidget {
@@ -18,15 +20,17 @@ class CategoryDetailsScreen extends StatefulWidget {
 }
 
 class _CategoryDetailsScreenState extends State<CategoryDetailsScreen> {
+  final cubit = CategoryCubit();
+  late FavoritesCubit favoritesCubit;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    favoritesCubit = BlocProvider.of<FavoritesCubit>(context);
     cubit.id = widget.id;
     cubit.getData();
   }
-
-  final cubit = CategoryCubit();
 
   @override
   Widget build(BuildContext context) {
@@ -34,27 +38,52 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen> {
       backgroundColor: Colors.white,
       body: BlocProvider(
         create: (context) => cubit,
-        child: BlocBuilder<CategoryCubit, CategoryState>(
-          builder: (context, state) {
-            if(state is CategorySuccessState){
-              return Container(
-                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-                child: GridView.builder(
-                  itemCount: cubit.categoryDetails['data']['data'].length,
-                  shrinkWrap: true,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisSpacing: 9,
-                      mainAxisSpacing: 6,
-                      mainAxisExtent: 350,
-                      crossAxisCount: 2),
-                  itemBuilder: (context, index) => buildProducts(index),
-                ),
-              );
-            }else{
-              return Center(child: CircularProgressIndicator.adaptive(),);
-            }
-
-          },
+        child: BlocListener<CategoryCubit, CategoryState>(
+          listener: (context, state) => logic(state),
+          child: BlocBuilder<CategoryCubit, CategoryState>(
+            builder: (context, state) {
+              if (state is CategorySuccessState) {
+                return Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        alignment: Alignment.center,
+                        width: 50,
+                        height: 50,
+                        child: InkWell(
+                            onTap: () => Navigator.pop(context, cubit.data),
+                            overlayColor: WidgetStateColor.transparent,
+                            child: Icon(Icons.arrow_back_ios_new_outlined)),
+                      ),
+                      Expanded(
+                        child: Container(
+                          child: GridView.builder(
+                            itemCount:
+                                cubit.categoryDetails['data']['data'].length,
+                            shrinkWrap: true,
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisSpacing: 9,
+                                    mainAxisSpacing: 6,
+                                    mainAxisExtent: 350,
+                                    crossAxisCount: 2),
+                            itemBuilder: (context, index) =>
+                                buildProducts(index),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              } else {
+                return Center(
+                  child: CircularProgressIndicator.adaptive(),
+                );
+              }
+            },
+          ),
         ),
       ),
     );
@@ -63,7 +92,7 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen> {
   Widget buildProducts(index) {
     return Container(
       child: InkWell(
-      onTap: ()=> Navigator.push(context,MaterialPageRoute(builder: (context) => ProductScreen(id: cubit.categoryDetails['data']['data'][index]['id'].toString()),)),
+        onTap: () => navToProductScreen(index),
         child: Column(
           children: [
             Container(
@@ -110,9 +139,7 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen> {
                         children: [
                           Text(
                             textAlign: TextAlign.start,
-                            '\$${cubit
-                                .categoryDetails['data']['data'][index]['price']
-                                .toString()}',
+                            '\$${cubit.categoryDetails['data']['data'][index]['price'].toString()}',
                             style: TextStyle(
                               color: Color(0xFF202020),
                               fontSize: 17,
@@ -122,10 +149,20 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen> {
                               letterSpacing: -0.17,
                             ),
                           ),
-                          InkWell(
-                            onTap: () {},
-                            overlayColor: WidgetStateColor.transparent,
-                            child: isLiked(index),
+                          BlocBuilder<CategoryCubit, CategoryState>(
+                            builder: (context, state) {
+                              return InkWell(
+                                onTap: () {
+                                  cubit.removeOrAdd(
+                                      cubit.categoryDetails['data']['data']
+                                              [index]['id']
+                                          .toString(),
+                                      index);
+                                },
+                                overlayColor: WidgetStateColor.transparent,
+                                child: isLiked(index),
+                              );
+                            },
                           ),
                         ],
                       ),
@@ -209,5 +246,23 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen> {
         height: 18,
       );
     }
+  }
+
+  logic(CategoryState state) {
+    if (state is CategoryAddOrRemove) {
+      Fluttertoast.showToast(msg: state.massage);
+    }
+  }
+
+  Future<void>navToProductScreen(index) async {
+    final res = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ProductScreen(
+            id: cubit.categoryDetails['data']['data'][index]['id']
+                .toString()),
+      ),
+    );
+    cubit.edit(res);
   }
 }

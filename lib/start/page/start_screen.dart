@@ -16,6 +16,8 @@ class _StartScreenState extends State<StartScreen> {
   void initState() {
     super.initState();
     PreferenceUtils.setString(PrefKeys.language,'en');
+    print(PreferenceUtils.getString(PrefKeys.apiToken));
+    print(PreferenceUtils.getBool(PrefKeys.loggedIn));
   }
   @override
   Widget build(BuildContext context) {

@@ -11,4 +11,6 @@ class EndPoints{
   static const String profile = 'profile';
   static const String cart = 'carts';
   static const String orders = 'orders';
+  static const String logout = 'logout';
+  static const String addresses = 'addresses';
 }

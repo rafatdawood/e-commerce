@@ -1,11 +1,13 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:e_commerce/category_details/page/category_details_screen.dart';
+import 'package:e_commerce/favorites/manager/favorites_cubit.dart';
 import 'package:e_commerce/home/manager/home_cubit.dart';
 import 'package:e_commerce/product/page/product_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -17,11 +19,13 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final cubit = HomeCubit();
+  late FavoritesCubit favoritesCubit;
 
   @override
   void initState() {
     super.initState();
     cubit.getAllData();
+    favoritesCubit = BlocProvider.of<FavoritesCubit>(context);
   }
 
   @override
@@ -32,7 +36,6 @@ class _HomeScreenState extends State<HomeScreen> {
         create: (context) => cubit,
         child: BlocBuilder<HomeCubit, HomeState>(
           builder: (context, state) {
-            print(state);
             if (state is HomeSuccessState) {
               return body();
             } else {
@@ -158,17 +161,20 @@ class _HomeScreenState extends State<HomeScreen> {
                         letterSpacing: -0.21,
                       ),
                     ),
-                    GridView.builder(
-                      itemCount:
-                          cubit.productsAndBanners['data']['products'].length,
-                      physics: NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisSpacing: 9,
-                          mainAxisSpacing: 6,
-                          mainAxisExtent: 350,
-                          crossAxisCount: 2),
-                      itemBuilder: (context, index) => buildProducts(index),
+                    BlocListener<HomeCubit, HomeState>(
+                      listener: (context, state) => logic(state),
+                      child: GridView.builder(
+                        itemCount:
+                            cubit.productsAndBanners['data']['products'].length,
+                        physics: NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisSpacing: 9,
+                            mainAxisSpacing: 6,
+                            mainAxisExtent: 350,
+                            crossAxisCount: 2),
+                        itemBuilder: (context, index) => buildProducts(index),
+                      ),
                     ),
                   ],
                 ),
@@ -210,11 +216,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => CategoryDetailsScreen(id: cubit.categories['data']['data'][index]['id'].toString(),),
-            )),
+        onTap: () => navToCategories(index),
         overlayColor: WidgetStateColor.transparent,
         child: Column(
           children: [
@@ -229,19 +231,20 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             Container(
-                padding: EdgeInsets.symmetric(horizontal: 6),
-                alignment: Alignment.centerLeft,
-                height: 32,
-                child: Text(
-                  cubit.categories['data']['data'][index]['name'],
-                  style: TextStyle(
-                    color: Color(0xFF202020),
-                    fontSize: 17,
-                    fontFamily: 'Raleway',
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.17,
-                  ),
-                ))
+              padding: EdgeInsets.symmetric(horizontal: 6),
+              alignment: Alignment.centerLeft,
+              height: 32,
+              child: Text(
+                cubit.categories['data']['data'][index]['name'],
+                style: TextStyle(
+                  color: Color(0xFF202020),
+                  fontSize: 17,
+                  fontFamily: 'Raleway',
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.17,
+                ),
+              ),
+            )
           ],
         ),
       ),
@@ -265,6 +268,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget buildProducts(index) {
     return Container(
       child: InkWell(
+        onTap: () => navToProductScreen(index),
+        overlayColor: WidgetStateColor.transparent,
         child: Column(
           children: [
             Stack(
@@ -332,7 +337,13 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                           InkWell(
-                            onTap: () {},
+                            onTap: () {
+                              cubit.removeOrAdd(
+                                  cubit.productsAndBanners['data']['products']
+                                          [index]['id']
+                                      .toString(),
+                                  index);
+                            },
                             overlayColor: WidgetStateColor.transparent,
                             child: isLiked(index),
                           ),
@@ -425,5 +436,35 @@ class _HomeScreenState extends State<HomeScreen> {
     } else {
       return SizedBox();
     }
+  }
+
+  logic(HomeState state) {
+    if (state is HomeAddOrRemove) {
+      Fluttertoast.showToast(msg: state.massage);
+    }
+  }
+
+  Future<void> navToProductScreen(index) async {
+    final res = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ProductScreen(
+            id: cubit.productsAndBanners['data']['products'][index]['id']
+                .toString()),
+      ),
+    );
+    cubit.edit(res);
+  }
+
+  Future<void> navToCategories(index) async {
+    final res = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CategoryDetailsScreen(
+          id: cubit.categories['data']['data'][index]['id'].toString(),
+        ),
+      ),
+    );
+    cubit.edit(res);
   }
 }

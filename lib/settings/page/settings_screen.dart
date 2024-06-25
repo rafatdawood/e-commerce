@@ -1,9 +1,13 @@
 import 'package:e_commerce/about/page/about_screen.dart';
 import 'package:e_commerce/address/page/address_screen.dart';
+import 'package:e_commerce/core/sheard.dart';
+import 'package:e_commerce/core/store_app_dio.dart';
+import 'package:e_commerce/core/store_app_endpoints.dart';
 import 'package:e_commerce/f_a_qs/page/f_a_qs_screen.dart';
 import 'package:e_commerce/language/page/language_screen.dart';
 import 'package:e_commerce/notifications/page/notifications_screen.dart';
 import 'package:e_commerce/profile/page/profile_screen.dart';
+import 'package:e_commerce/start/page/start_screen.dart';
 import 'package:flutter/material.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -255,13 +259,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           fontWeight: FontWeight.w800,
                         ),
                       ),
-                      Text(
-                        'Version 1.0 June, 2024',
-                        style: TextStyle(
-                          color: Color(0xFF202020),
-                          fontSize: 15,
-                          fontFamily: 'Raleway',
-                          fontWeight: FontWeight.w800,
+                      InkWell(
+                        onTap: () => logout(),
+                        child: Text(
+                          'Version 1.0 June, 2024',
+                          style: TextStyle(
+                            color: Color(0xFF202020),
+                            fontSize: 15,
+                            fontFamily: 'Raleway',
+                            fontWeight: FontWeight.w800,
+                          ),
                         ),
                       ),
                     ],
@@ -273,5 +280,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       ),
     );
+  }
+
+  logout() {
+    AppDio.post(endpoint: EndPoints.logout,).then((val){
+      PreferenceUtils.setString(PrefKeys.apiToken, '');
+      PreferenceUtils.setBool(PrefKeys.loggedIn, false);
+      Navigator.push(context, MaterialPageRoute(builder: (context) => StartScreen(),));
+    });
   }
 }

@@ -1,4 +1,5 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:e_commerce/favorites/manager/favorites_cubit.dart';
 import 'package:e_commerce/product/manager/product_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,11 +19,13 @@ class ProductScreen extends StatefulWidget {
 
 class _ProductScreenState extends State<ProductScreen> {
   final cubit = ProductCubit();
+  late FavoritesCubit favoritesCubit;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    favoritesCubit = BlocProvider.of<FavoritesCubit>(context);
     cubit.id = widget.id;
     cubit.getData();
   }
@@ -36,190 +39,213 @@ class _ProductScreenState extends State<ProductScreen> {
         child: BlocBuilder<ProductCubit, ProductState>(
           builder: (context, state) {
             if (state is ProductSuccessState) {
-              return Column(
-                children: [
-                  Expanded(
-                      child: ListView(
-                        children: [
-                          Container(
-                            height: 439,
-                            width: 100.w,
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                CarouselSlider.builder(
-                                  itemCount:
-                                  cubit.productData['data']['images'].length,
-                                  itemBuilder: (BuildContext context, int index,
-                                      int realIndex) {
-                                    final image =
-                                    cubit.productData['data']['images'][index];
-                                    return buildImage(
-                                      image,
-                                      index,
-                                    );
-                                  },
-                                  options: CarouselOptions(
-                                    height: 439,
-                                    viewportFraction: 1,
-                                    autoPlay: true,
-                                    enableInfiniteScroll: true,
-                                    onPageChanged: (index, reason) =>
-                                        cubit.showImages(index),
-                                  ),
-                                ),
-                                Positioned(
-                                  child: buildIndicator(),
-                                  bottom: 10,
-                                ),
-                              ],
-                            ),
-                          ),
-                          Container(
-                            margin:
-                            EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  child: Text(
-                                    '\$${cubit.productData['data']['price']}',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 26,
-                                      fontFamily: 'Raleway',
-                                      fontWeight: FontWeight.w800,
-                                      letterSpacing: -0.26,
-                                    ),
-                                  ),
-                                  margin: EdgeInsets.symmetric(vertical: 5),
-                                ),
-                                discount(),
-                                Container(
-                                  margin: EdgeInsets.symmetric(vertical: 15),
-                                  width: 335,
-                                  height: 62,
-                                  child: Text(
-                                    cubit.productData['data']['name'],
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 15,
-                                      fontFamily: 'Nunito Sans',
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  child: Text(
-                                    'Description',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 26,
-                                      fontFamily: 'Raleway',
-                                      fontWeight: FontWeight.w800,
-                                      letterSpacing: -0.26,
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  margin: EdgeInsets.symmetric(vertical: 15),
-                                  width: 100.w,
-                                  child: Text(
-                                    cubit.productData['data']['description'],
-                                    style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 13,
-                                        fontFamily: 'Nunito Sans',
-                                        fontWeight: FontWeight.w400,
-                                        height: 2.5),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        ],
-                      )),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
-                    width: 100.w,
-                    height: 84,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              return SafeArea(
+                child: Column(
+                  children: [
+                    Expanded(
+                        child: ListView(
                       children: [
-                        InkWell(
-                          onTap: () {},
-                          overlayColor: WidgetStateColor.transparent,
-                          child: isLiked(),
-                        ),
-                        Expanded(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              InkWell(
-                                onTap: () =>
-                                    cubit.addToCard(
-                                        cubit.productData['data']['id']),
-                                overlayColor: WidgetStateColor.transparent,
-                                child: Container(
-                                  alignment: Alignment.center,
-                                  decoration: ShapeDecoration(
-                                    color: Color(0xFF202020),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(11),
+                        Stack(
+                          children: [
+                            Container(
+                              height: 439,
+                              width: 100.w,
+                              child: Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  CarouselSlider.builder(
+                                    itemCount: cubit
+                                        .productData['data']['images'].length,
+                                    itemBuilder: (BuildContext context,
+                                        int index, int realIndex) {
+                                      final image = cubit.productData['data']
+                                          ['images'][index];
+                                      return buildImage(
+                                        image,
+                                        index,
+                                      );
+                                    },
+                                    options: CarouselOptions(
+                                      height: 439,
+                                      viewportFraction: 1,
+                                      autoPlay: true,
+                                      enableInfiniteScroll: true,
+                                      onPageChanged: (index, reason) =>
+                                          cubit.showImages(index),
                                     ),
                                   ),
-                                  width: 128,
-                                  height: 40,
-                                  child: Text(
-                                    'Add to cart',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      color: Color(0xFFF3F3F3),
-                                      fontSize: 16,
-                                      fontFamily: 'Nunito Sans',
-                                      fontWeight: FontWeight.w300,
-                                    ),
+                                  Positioned(
+                                    child: buildIndicator(),
+                                    bottom: 10,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              alignment: Alignment.center,
+                              height: 50,
+                              width: 50,
+                              child: InkWell(
+                                onTap: ()=>Navigator.pop(context,cubit.data),
+                                overlayColor: WidgetStateColor.transparent,
+                                child: Icon(Icons.arrow_back_ios_new_outlined),
+                              ),
+                            )
+                          ],
+                        ),
+                        Container(
+                          margin: EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                child: Text(
+                                  '\$${cubit.productData['data']['price']}',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 26,
+                                    fontFamily: 'Raleway',
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: -0.26,
+                                  ),
+                                ),
+                                margin: EdgeInsets.symmetric(vertical: 5),
+                              ),
+                              discount(),
+                              Container(
+                                margin: EdgeInsets.symmetric(vertical: 15),
+                                width: 335,
+                                height: 62,
+                                child: Text(
+                                  cubit.productData['data']['name'],
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 15,
+                                    fontFamily: 'Nunito Sans',
+                                    fontWeight: FontWeight.w400,
                                   ),
                                 ),
                               ),
-                              BlocListener<ProductCubit, ProductState>(
-                                listener: (context, state) => addToCart(state),
-                                child: InkWell(
-                                  onTap: () {},
-                                  overlayColor: WidgetStateColor.transparent,
-                                  child: Container(
-                                    alignment: Alignment.center,
-                                    decoration: ShapeDecoration(
-                                      color: Color(0xFF004CFF),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(11),
-                                      ),
-                                    ),
-                                    width: 128,
-                                    height: 40,
-                                    child: Text(
-                                      'Buy now',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color: Color(0xFFF3F3F3),
-                                        fontSize: 16,
-                                        fontFamily: 'Nunito Sans',
-                                        fontWeight: FontWeight.w300,
-                                      ),
-                                    ),
+                              Container(
+                                child: Text(
+                                  'Description',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 26,
+                                    fontFamily: 'Raleway',
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: -0.26,
                                   ),
+                                ),
+                              ),
+                              Container(
+                                margin: EdgeInsets.symmetric(vertical: 15),
+                                width: 100.w,
+                                child: Text(
+                                  cubit.productData['data']['description'],
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 13,
+                                      fontFamily: 'Nunito Sans',
+                                      fontWeight: FontWeight.w400,
+                                      height: 2.5),
                                 ),
                               ),
                             ],
                           ),
                         )
                       ],
-                    ),
-                  )
-                ],
+                    )),
+                    BlocListener<ProductCubit, ProductState>(
+                      listener: (context, state) => logic(state),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        width: 100.w,
+                        height: 84,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            InkWell(
+                              onTap: () {
+                                cubit.removeOrAdd(
+                                    cubit.productData['data']['id'].toString());
+                              },
+                              overlayColor: WidgetStateColor.transparent,
+                              child: isLiked(),
+                            ),
+                            Expanded(
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  InkWell(
+                                    onTap: () => cubit.addToCard(
+                                        cubit.productData['data']['id']),
+                                    overlayColor: WidgetStateColor.transparent,
+                                    child: Container(
+                                      alignment: Alignment.center,
+                                      decoration: ShapeDecoration(
+                                        color: Color(0xFF202020),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(11),
+                                        ),
+                                      ),
+                                      width: 128,
+                                      height: 40,
+                                      child: Text(
+                                        'Add to cart',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          color: Color(0xFFF3F3F3),
+                                          fontSize: 16,
+                                          fontFamily: 'Nunito Sans',
+                                          fontWeight: FontWeight.w300,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  InkWell(
+                                    onTap: () {},
+                                    overlayColor: WidgetStateColor.transparent,
+                                    child: Container(
+                                      alignment: Alignment.center,
+                                      decoration: ShapeDecoration(
+                                        color: Color(0xFF004CFF),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(11),
+                                        ),
+                                      ),
+                                      width: 128,
+                                      height: 40,
+                                      child: Text(
+                                        'Buy now',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          color: Color(0xFFF3F3F3),
+                                          fontSize: 16,
+                                          fontFamily: 'Nunito Sans',
+                                          fontWeight: FontWeight.w300,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    )
+                  ],
+                ),
               );
             } else {
-              return Center(child: CircularProgressIndicator.adaptive(),);
+              return Center(
+                child: CircularProgressIndicator.adaptive(),
+              );
             }
           },
         ),
@@ -227,8 +253,10 @@ class _ProductScreenState extends State<ProductScreen> {
     );
   }
 
-  Widget buildImage(image,
-      int index,) =>
+  Widget buildImage(
+    image,
+    int index,
+  ) =>
       Container(
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
@@ -244,8 +272,7 @@ class _ProductScreenState extends State<ProductScreen> {
         ),
       );
 
-  Widget buildIndicator() =>
-      AnimatedSmoothIndicator(
+  Widget buildIndicator() => AnimatedSmoothIndicator(
         activeIndex: cubit.activeIndex,
         count: cubit.productData['data']['images'].length,
         effect: ExpandingDotsEffect(
@@ -318,8 +345,8 @@ class _ProductScreenState extends State<ProductScreen> {
     }
   }
 
-  addToCart(ProductState state) {
-    if(state is ProductAddSuccess){
+  logic(ProductState state) {
+    if (state is ProductAddSuccess) {
       Fluttertoast.showToast(msg: state.massage);
     }
   }

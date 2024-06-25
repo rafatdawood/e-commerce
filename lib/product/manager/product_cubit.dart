@@ -12,19 +12,28 @@ class ProductCubit extends Cubit<ProductState> {
     'data':{}
   };
   String id = '';
+  List data = [];
 
-  getData(){
-    AppDio.get(endpoint: '${EndPoints.categoriesProd}/$id').then((val){
-      productData['data']=val.data['data'];
+  Future<void>getData()async{
+    final response = await AppDio.get(endpoint: '${EndPoints.categoriesProd}/$id');
+      productData['data']=response.data['data'];
       emit(ProductSuccessState());
-    });
   }
 
-  addToCard(id){
-    AppDio.post(endpoint: EndPoints.cart,body: {'product_id':id}).then((val){
-     emit(ProductAddSuccess(val.data['message']));
-     emit(ProductSuccessState());
-    });
+  Future<void>addToCard(id)async{
+    final response = await AppDio.post(endpoint: EndPoints.cart,body: {'product_id':id});
+     emit(ProductAddSuccess(response.data['message']));
+  }
+
+  Future<void>removeOrAdd(String id)async{
+    final response = await AppDio.post(endpoint: EndPoints.getFavorites,body: {'product_id':id});
+    if(response.data['status']){
+      productData['data']['in_favorites'] =
+      !productData['data']['in_favorites'];
+      data.add({'id':int.parse(id),'in_favorites':productData['data']['in_favorites']});
+      emit(ProductAddSuccess(response.data['message']));
+    }
+    emit(ProductSuccessState());
   }
 
 
