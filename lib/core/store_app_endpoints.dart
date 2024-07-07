@@ -13,4 +13,5 @@ class EndPoints{
   static const String orders = 'orders';
   static const String logout = 'logout';
   static const String addresses = 'addresses';
+  static const String updateProfile = 'update-profile';
 }
