@@ -86,8 +86,8 @@ class _AddressScreenState extends State<AddressScreen> {
                               child: InkWell(
                                 overlayColor: WidgetStateColor.transparent,
                                 onTap: () => navToAddAddressScreen(),
-                                child: SvgPicture.asset(
-                                    'assets/icons/more.svg'),
+                                child:
+                                    SvgPicture.asset('assets/icons/more.svg'),
                               ),
                             ),
                           ],
@@ -284,12 +284,7 @@ class _AddressScreenState extends State<AddressScreen> {
                 ),
                 InkWell(
                   overlayColor: WidgetStateColor.transparent,
-                  onTap: () =>
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => EditAddressScreen(),
-                          )),
+                  onTap: () => navToEditScreen(index),
                   child: Container(
                     alignment: Alignment.center,
                     width: 128.w,
@@ -322,17 +317,28 @@ class _AddressScreenState extends State<AddressScreen> {
   }
 
   logic(state) {
-    if(state is AddressDeleteSuccessState){
+    if (state is AddressDeleteSuccessState) {
       Fluttertoast.showToast(msg: state.massage);
-    }else if(state is AddressDeleteFailureState){
+    } else if (state is AddressDeleteFailureState) {
       Fluttertoast.showToast(msg: state.errorMassage);
     }
   }
 
-  navToAddAddressScreen() async{
-    final res = await Navigator.push(context, MaterialPageRoute(
-      builder: (context) =>
-          AddAddressScreen(),));
+  navToAddAddressScreen() async {
+    final res = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AddAddressScreen(),
+        ));
     cubit.addAddress(res);
+  }
+
+  navToEditScreen(index)async {
+    final res = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => EditAddressScreen(data: cubit.addressData['data']['data'][index],),
+        ));
+    cubit.edit(res);
   }
 }

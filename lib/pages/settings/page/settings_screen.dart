@@ -24,6 +24,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        backgroundColor: Colors.white,
         body: Padding(
           padding: EdgeInsets.only(left: 20.w, right: 20.w, top: 10.h),
           child: Column(

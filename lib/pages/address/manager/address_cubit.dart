@@ -35,4 +35,9 @@ class AddressCubit extends Cubit<AddressState> {
     addressData['data']['data'].add(data);
     emit(AddressSuccessState());
   }
+  edit(res){
+      int x = addressData['data']['data'].indexWhere((e)=> e['id'] == res['id']);
+      addressData['data']['data'][x] = res;
+      emit(AddressSuccessState());
+  }
 }
